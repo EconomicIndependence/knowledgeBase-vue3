@@ -61,17 +61,14 @@
                 trigger="click"
                 placement="bottom-end"
               >
-                <n-space align="center" style="cursor: pointer">
-                  <n-avatar 
-                    round 
-                    size="small" 
-                    :src="userAvatar"
+                <div class="user-info">
+                  <n-avatar
+                    v-if="userInfo?.avatar"
+                    :src="userInfo.avatar"
+                    round
                   />
-                  <span>Admin</span>
-                  <n-icon size="tiny">
-                    <chevron-down />
-                  </n-icon>
-                </n-space>
+                  <span>{{ userInfo?.username || 'Admin' }}</span>
+                </div>
               </n-dropdown>
             </n-space>
           </div>
@@ -94,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { 
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, 
@@ -115,6 +112,7 @@ import {
 import TabsView from '../components/TabsView.vue'
 import NotificationPopover from '../components/NotificationPopover.vue'
 import { useThemeStore } from '../stores/theme'
+import { useUserStore } from '@/store/modules/user'
 
 const router = useRouter()
 const route = useRoute()
@@ -125,6 +123,7 @@ const message = useMessage()
 const themeStore = useThemeStore()
 const showUserDropdown = ref(false)
 const userAvatar = 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
+const userStore = useUserStore()
 
 // 面包屑导航
 const breadcrumbs = computed(() => {
@@ -232,27 +231,51 @@ const handleMenuClick = (key: string) => {
   router.push(`/${key}`)
 }
 
-const userOptions = [
+// 使用计算属性获取用户信息
+const userInfo = computed(() => userStore.userInfo)
+
+// 使用 ref 而不是 computed 来管理用户选项
+const userOptions = ref([
   {
-    label: '个人信息',
-    key: 'profile',
-    icon: renderIcon(PersonOutline)
+    label: userInfo.value?.username || 'Admin',
+    key: 'header',
+    disabled: true
   },
   {
-    label: '系统设置',
-    key: 'settings',
-    icon: renderIcon(SettingsOutline)
-  },
-  {
-    type: 'divider',
-    key: 'd1'
+    label: '个人资料',
+    key: 'profile'
   },
   {
     label: '退出登录',
-    key: 'logout',
-    icon: renderIcon(LogOutOutline)
+    key: 'logout'
   }
-]
+])
+
+// 监听用户信息变化
+watch(
+  () => userStore.userInfo,
+  (newUserInfo) => {
+    if (newUserInfo) {
+      // 更新用户选项
+      userOptions.value = [
+        {
+          label: newUserInfo.username || 'Admin',
+          key: 'header',
+          disabled: true
+        },
+        {
+          label: '个人资料',
+          key: 'profile'
+        },
+        {
+          label: '退出登录',
+          key: 'logout'
+        }
+      ]
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 const handleUserSelect = (key: string) => {
   switch (key) {

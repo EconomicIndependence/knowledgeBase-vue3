@@ -54,11 +54,20 @@
               </n-input>
             </n-form-item>
           </div>
-          <div class="login-options">
-            <n-checkbox v-model:checked="rememberMe">
-              <span class="cyber-text">记住我</span>
-            </n-checkbox>
-            <n-button text type="primary" class="cyber-link">忘记密码？</n-button>
+          <div v-if="!isLogin" class="cyber-input-wrapper">
+            <n-form-item path="confirmPassword">
+              <n-input
+                v-model:value="formValue.confirmPassword"
+                type="password"
+                show-password-on="click"
+                placeholder="确认密码"
+                :input-props="{ autocomplete: 'off' }"
+              >
+                <template #prefix>
+                  <n-icon><lock-closed-outline /></n-icon>
+                </template>
+              </n-input>
+            </n-form-item>
           </div>
           <div class="cyber-button-container">
             <n-button
@@ -66,15 +75,22 @@
               block
               size="large"
               :loading="loading"
-              @click="handleLogin"
+              @click="handleSubmit"
               class="cyber-button"
             >
               <span class="button-glitch"></span>
-              <span class="button-text">{{ loading ? '正在验证...' : '登 录' }}</span>
+              <span class="button-text">
+                {{ isLogin ? (loading ? '正在验证...' : '登 录') : '注 册' }}
+              </span>
+            </n-button>
+          </div>
+          <div class="login-options" style="justify-content: center; margin-top: 16px;">
+            <n-button text type="primary" class="cyber-link" @click="toggleMode">
+              {{ isLogin ? '没有账号？点击注册' : '已有账号？返回登录' }}
             </n-button>
           </div>
         </n-form>
-        <div class="login-footer">
+        <div v-if="isLogin" class="login-footer">
           <div class="cyber-divider">
             <span class="cyber-text">其他登录方式</span>
           </div>
@@ -95,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import type { FormInst } from 'naive-ui'
@@ -110,16 +126,25 @@ import {
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import VanillaTilt from 'vanilla-tilt'
+import { useUserStore } from '@/store/modules/user'
 
 const router = useRouter()
 const message = useMessage()
+const userStore = useUserStore()
 const formRef = ref<FormInst | null>(null)
 const rememberMe = ref(false)
 const loading = ref(false)
 
-const formValue = ref({
+interface FormState {
+  username: string
+  password: string
+  confirmPassword: string
+}
+
+const formValue = reactive<FormState>({
   username: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 })
 
 const rules = {
@@ -132,19 +157,49 @@ const rules = {
     required: true,
     message: '请输入密码',
     trigger: ['blur', 'input']
+  },
+  confirmPassword: {
+    required: true,
+    message: '请确认密码',
+    trigger: ['blur', 'input']
   }
 }
 
-const handleLogin = (e: MouseEvent) => {
+const handleSubmit = (e: MouseEvent) => {
   e.preventDefault()
+  
+  if (!isLogin.value) {
+    if (!formValue.confirmPassword) {
+      message.error('请确认密码')
+      return
+    }
+    if (formValue.password !== formValue.confirmPassword) {
+      message.error('两次输入的密码不一致')
+      return
+    }
+  }
+
   formRef.value?.validate(async (errors) => {
     if (!errors) {
       loading.value = true
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        localStorage.setItem('isLoggedIn', 'true')
-        message.success('登录成功')
-        router.push('/dashboard')
+        if (isLogin.value) {
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          localStorage.setItem('isLoggedIn', 'true')
+          message.success('登录成功')
+          router.push('/dashboard')
+        } else {
+          await userStore.register({
+            username: formValue.username,
+            password: formValue.password
+          })
+          message.success('注册成功')
+          isLogin.value = true
+          formValue.password = ''
+          formValue.confirmPassword = ''
+        }
+      } catch (error: any) {
+        message.error(error.message || (isLogin.value ? '登录失败' : '注册失败'))
       } finally {
         loading.value = false
       }
@@ -172,6 +227,14 @@ const socialIcons = [
 
 const generateRandomBinary = () => {
   return Array.from({ length: 20 }, () => Math.round(Math.random())).join('')
+}
+
+const isLogin = ref(true)
+
+const toggleMode = () => {
+  isLogin.value = !isLogin.value
+  formValue.password = ''
+  formValue.confirmPassword = ''
 }
 </script>
 
@@ -488,5 +551,10 @@ const generateRandomBinary = () => {
   0% { background-position: -100% -100%; }
   50% { background-position: 100% 100%; }
   100% { background-position: -100% -100%; }
+}
+
+.toggle-link {
+  color: var(--primary-color);
+  cursor: pointer;
 }
 </style> 
