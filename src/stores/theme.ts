@@ -56,53 +56,86 @@ export const useThemeStore = defineStore('theme', () => {
     const hover = adjustColor(color, 20)
     const pressed = adjustColor(color, -20)
     
-    // 预先计算主题相关的颜色
     const isDarkMode = isDark.value
     const backgroundColor = isDarkMode ? '#18181c' : '#ffffff'
     const cardColor = isDarkMode ? '#1f1f23' : '#ffffff'
     const modalColor = isDarkMode ? '#242429' : '#f5f7f9'
-    const borderColor = isDarkMode ? '#333' : '#eee'
     
+    // 修改边框颜色配置，使深浅切换更平滑
+    const borderColor = isDarkMode 
+      ? 'rgba(255, 255, 255, 0.12)' 
+      : 'rgba(0, 0, 0, 0.12)'
+    const borderHoverColor = isDarkMode 
+      ? 'rgba(255, 255, 255, 0.18)' 
+      : 'rgba(0, 0, 0, 0.18)'
+    const borderPressedColor = isDarkMode 
+      ? 'rgba(255, 255, 255, 0.08)' 
+      : 'rgba(0, 0, 0, 0.08)'
+    const dividerColor = isDarkMode 
+      ? 'rgba(255, 255, 255, 0.06)' 
+      : 'rgba(0, 0, 0, 0.06)'
+
     themeOverrides.value = {
       common: {
+        // 基础颜色
+        baseColor: backgroundColor,
+        // 主题色
         primaryColor: color,
         primaryColorHover: hover,
         primaryColorPressed: pressed,
         primaryColorSuppl: hover,
-        // 主题相关颜色
-        bodyColor: backgroundColor,
-        cardColor: cardColor,
-        modalColor: modalColor,
-        borderColor: borderColor,
+        // 文本颜色
         textColor1: isDarkMode ? '#ffffff' : '#333333',
         textColor2: isDarkMode ? '#ccc' : '#666',
         textColor3: isDarkMode ? '#999' : '#999',
+        // 边框
+        borderColor: borderColor,
+        borderColorHover: borderHoverColor,
+        borderColorPressed: borderPressedColor,
+        borderColorModal: isDarkMode 
+          ? 'rgba(255, 255, 255, 0.15)' 
+          : 'rgba(0, 0, 0, 0.15)',
         // 背景色
-        baseColor: backgroundColor,
-        // 悬浮状态
-        hoverColor: isDarkMode ? '#242424' : '#f5f5f5'
+        bodyColor: backgroundColor,
+        cardColor: cardColor,
+        modalColor: modalColor,
+        // 其他
+        fontSize: '14px',
+        borderRadius: '8px',
+        dividerColor: dividerColor
       },
       Card: {
-        borderRadius: '8px',
+        borderRadius: '12px',
         color: isDarkMode ? '#242429' : '#ffffff',
         colorModal: modalColor,
         textColor: isDarkMode ? '#ffffff' : '#333333',
         titleTextColor: isDarkMode ? '#ffffff' : '#333333',
         closeIconColor: isDarkMode ? '#666' : '#999',
         closeIconColorHover: isDarkMode ? '#fff' : '#333',
-        closeColorHover: isDarkMode ? '#333' : '#f5f5f5'
+        closeColorHover: isDarkMode ? '#333' : '#f5f5f5',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+        paddingMedium: '20px',
+        titleFontSize: '16px',
+        titleFontWeight: '600'
       },
       Tag: {
         borderRadius: '4px',
         textColor: isDarkMode ? '#ffffff' : '#333333',
         color: isDarkMode ? '#242429' : '#ffffff',
-        border: isDarkMode ? '1px solid #333' : '1px solid #e0e0e0'
+        border: isDarkMode ? '1px solid #333' : '1px solid #e0e0e0',
+        heightMedium: '24px',
+        fontWeight: '500'
       },
       Button: {
         colorPrimary: color,
         colorHoverPrimary: hover,
         colorPressedPrimary: pressed,
-        colorFocusPrimary: hover
+        colorFocusPrimary: hover,
+        borderRadius: '6px',
+        heightMedium: '34px',
+        fontWeight: '500',
+        boxShadow: 'none',
+        textColor: isDarkMode ? '#ffffff' : '#333333'
       },
       Input: {
         color: isDarkMode ? '#242429' : '#ffffff',
@@ -123,10 +156,28 @@ export const useThemeStore = defineStore('theme', () => {
           Prefix: {
             textColor: isDarkMode ? '#666' : '#999'
           }
-        }
+        },
+        borderRadius: '6px',
+        heightMedium: '34px',
+        boxShadow: 'none'
       },
       Menu: {
-        borderColor: borderColor
+        borderColor: borderColor,
+        borderRadius: '8px',
+        itemHeight: '40px',
+        itemTextColorHover: color,
+        itemTextColorActive: color,
+        itemColorActive: isDarkMode 
+          ? 'rgba(255, 255, 255, 0.05)' 
+          : 'rgba(0, 0, 0, 0.05)',
+        itemColorActiveHover: isDarkMode 
+          ? 'rgba(255, 255, 255, 0.08)' 
+          : 'rgba(0, 0, 0, 0.08)',
+        itemTextColor: isDarkMode 
+          ? 'rgba(255, 255, 255, 0.82)' 
+          : 'rgba(0, 0, 0, 0.82)',
+        arrowColor: isDarkMode ? '#666' : '#999',
+        boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
       },
       Checkbox: {
         colorChecked: color,
@@ -214,7 +265,11 @@ export const useThemeStore = defineStore('theme', () => {
         tabTextColorActive: color,
         tabTextColor: isDarkMode ? '#999' : '#666',
         barColor: color,
-        tabColorHover: isDarkMode ? '#1a1a1f' : '#f5f5f5'
+        tabColorHover: isDarkMode ? '#1a1a1f' : '#f5f5f5',
+        tabFontWeight: '500',
+        tabBorderRadius: '6px',
+        tabPadding: '8px 16px',
+        barWidth: '2px'
       },
       Tree: {
         nodeTextColor: isDarkMode ? '#ffffff' : '#333333',
@@ -237,18 +292,25 @@ export const useThemeStore = defineStore('theme', () => {
       Dialog: {
         color: isDarkMode ? '#242429' : '#ffffff',
         textColor: isDarkMode ? '#ffffff' : '#333333',
-        titleTextColor: isDarkMode ? '#ffffff' : '#333333'
+        titleTextColor: isDarkMode ? '#ffffff' : '#333333',
+        borderRadius: '12px',
+        padding: '24px',
+        titleFontSize: '18px',
+        titleFontWeight: '600',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
       },
       Popover: {
         color: isDarkMode ? '#242429' : '#ffffff',
         textColor: isDarkMode ? '#ffffff' : '#333333',
-        padding: '16px',
+        padding: '12px 16px',
         border: isDarkMode ? '1px solid #333' : '1px solid #eee',
         peers: {
           Scrollbar: {
             railColor: isDarkMode ? '#333' : '#f5f5f5'
           }
-        }
+        },
+        borderRadius: '8px',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)'
       },
       Empty: {
         textColor: isDarkMode ? '#666' : '#999',
@@ -268,13 +330,18 @@ export const useThemeStore = defineStore('theme', () => {
         closeIconColorHover: isDarkMode ? '#fff' : '#333',
         closeColorHover: isDarkMode ? '#333' : '#f5f5f5'
       }
-    }
+    } as GlobalThemeOverrides
     
     // 应用 CSS 变量
     const root = document.documentElement
     root.style.setProperty('--background-color', backgroundColor)
     root.style.setProperty('--text-color', isDarkMode ? '#ffffff' : '#333333')
     root.style.setProperty('--border-color', borderColor)
+    root.style.setProperty('--border-color-hover', borderHoverColor)
+    root.style.setProperty('--divider-color', dividerColor)
+    root.style.setProperty('--menu-item-color', isDarkMode 
+      ? 'rgba(255, 255, 255, 0.05)' 
+      : 'rgba(0, 0, 0, 0.05)')
   }
 
   // 辅助函数：调整颜色亮度
@@ -292,13 +359,18 @@ export const useThemeStore = defineStore('theme', () => {
     return `#${adjustedR.toString(16).padStart(2, '0')}${adjustedG.toString(16).padStart(2, '0')}${adjustedB.toString(16).padStart(2, '0')}`
   }
 
-  // 监听主题变化，更新样式
+  // 监听主题变，更新样式
   watch(isDark, (newValue) => {
-    document.documentElement.classList.toggle('dark', newValue)
-    // 使用 requestAnimationFrame 确保在下一帧更新主题
+    document.documentElement.classList.add('theme-transitioning')
+    
     requestAnimationFrame(() => {
       const currentColor = themeOverrides.value.common?.primaryColor || '#18a058'
       updatePrimaryColor(currentColor)
+      document.documentElement.classList.toggle('dark', newValue)
+      
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning')
+      }, 300)  // 修改为统一的时间
     })
   })
 

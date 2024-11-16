@@ -84,7 +84,7 @@
               <n-space vertical>
                 <n-checkbox-group v-model:value="formValue.allowedFileTypes">
                   <n-space>
-                    <n-checkbox value="image">图片文件</n-checkbox>
+                    <n-checkbox value="image">图���文件</n-checkbox>
                     <n-checkbox value="document">文档文件</n-checkbox>
                     <n-checkbox value="video">视频文件</n-checkbox>
                     <n-checkbox value="audio">音频文件</n-checkbox>

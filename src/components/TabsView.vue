@@ -1,272 +1,245 @@
 <template>
   <div class="tabs-view">
-    <n-scrollbar x-scrollable class="tabs-scrollbar">
-      <div class="tabs-wrapper">
-        <n-tag
-          v-for="tag in visitedTags"
-          :key="tag.path"
-          :type="isActive(tag) ? 'primary' : 'default'"
-          :closable="tag.path !== '/dashboard'"
-          class="tab-item"
-          :class="{ 'tab-item-active': isActive(tag) }"
-          @close.stop="closeTag(tag)"
-          @click="goToPage(tag)"
-        >
-          <template #icon>
-            <n-icon :component="tag.icon || HomeOutline" />
-          </template>
-          {{ tag.title }}
-        </n-tag>
-      </div>
-    </n-scrollbar>
-    <div class="tabs-action">
-      <n-dropdown 
-        trigger="click" 
-        :options="dropdownOptions"
-        @select="handleSelect"
+    <div class="tabs-wrapper">
+      <div
+        v-for="tab in tabs"
+        :key="tab.path"
+        class="tab-item"
+        :class="{ 'tab-item-active': isActive(tab.path) }"
+        @click="handleTabClick(tab)"
       >
-        <n-button quaternary circle size="small" class="action-button">
-          <template #icon>
-            <n-icon><settings-outline /></n-icon>
-          </template>
-        </n-button>
-      </n-dropdown>
+        <n-space align="center" :size="4">
+          <n-icon size="16">
+            <component :is="tab.icon || DocumentTextOutline" />
+          </n-icon>
+          <span class="tab-text">{{ tab.title }}</span>
+          <div
+            v-if="tabs.length > 1"
+            class="close-button"
+            @click.stop="handleClose(tab)"
+          >
+            <n-icon size="14">
+              <close-outline />
+            </n-icon>
+          </div>
+        </n-space>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { NSpace, NIcon } from 'naive-ui'
+import { DocumentTextOutline, CloseOutline } from '@vicons/ionicons5'
 import type { Component } from 'vue'
-import { NTag, NScrollbar, NButton, NDropdown, NIcon, type DropdownOption } from 'naive-ui'
-import { HomeOutline, SettingsOutline } from '@vicons/ionicons5'
-import { useThemeStore } from '@/stores/theme'
 
-interface TagView {
-  title: string
+interface Tab {
   path: string
-  name?: string
+  title: string
   icon?: Component
-  meta?: {
-    title?: string
-    icon?: Component
-  }
 }
 
-const router = useRouter()
+// 标签页数据
+const tabs = ref<Tab[]>([])
 const route = useRoute()
-const themeStore = useThemeStore()
+const router = useRouter()
 
-const visitedTags = ref<TagView[]>([
-  {
-    title: '首页',
-    path: '/dashboard',
-    icon: HomeOutline
-  }
-])
-
-const isActive = (tag: TagView): boolean => {
-  return tag.path === route.path
+// 判断标签页是否激活
+const isActive = (path: string) => {
+  return route.path === path
 }
 
-const addTag = (tag: TagView): void => {
-  if (!visitedTags.value.find((v: TagView) => v.path === tag.path)) {
-    visitedTags.value.push(tag)
+// 处理标签页点击
+const handleTabClick = (tab: Tab) => {
+  if (route.path !== tab.path) {
+    router.push(tab.path)
   }
 }
 
-const closeTag = (tag: TagView): void => {
-  const index = visitedTags.value.findIndex((v: TagView) => v.path === tag.path)
-  if (isActive(tag) && index > 0) {
-    router.push(visitedTags.value[index - 1].path)
-  }
-  visitedTags.value = visitedTags.value.filter((v: TagView) => v.path !== tag.path)
-}
-
-const goToPage = (tag: TagView): void => {
-  router.push(tag.path)
-}
-
-const dropdownOptions: DropdownOption[] = [
-  {
-    label: '关闭其他',
-    key: 'closeOthers'
-  },
-  {
-    label: '关闭右侧',
-    key: 'closeRight'
-  },
-  {
-    label: '关闭所有',
-    key: 'closeAll'
-  }
-]
-
-const handleSelect = (key: string): void => {
-  switch (key) {
-    case 'closeOthers':
-      visitedTags.value = visitedTags.value.filter(
-        (tag: TagView) => tag.path === '/dashboard' || tag.path === route.path
-      )
-      break
-    case 'closeRight':
-      const currentIndex = visitedTags.value.findIndex((tag: TagView) => tag.path === route.path)
-      visitedTags.value = visitedTags.value.slice(0, currentIndex + 1)
-      break
-    case 'closeAll':
-      visitedTags.value = visitedTags.value.filter((tag: TagView) => tag.path === '/dashboard')
-      router.push('/dashboard')
-      break
+// 处理关闭标签页
+const handleClose = async (tab: Tab) => {
+  const index = tabs.value.findIndex(t => t.path === tab.path)
+  if (index > -1) {
+    if (isActive(tab.path)) {
+      // 如果关闭的是当前标签页，先跳转到其他标签页
+      const nextTab = tabs.value[index + 1] || tabs.value[index - 1]
+      if (nextTab) {
+        await router.push(nextTab.path)
+      }
+    }
+    // 然后移除标签页
+    tabs.value.splice(index, 1)
   }
 }
 
-// 监听路由变化，添加标签
+// 监听路由变化，添加标签页
 watch(
   () => route.path,
-  (newPath: string) => {
-    if (route.meta?.title) {
-      addTag({
-        title: route.meta.title as string,
+  (newPath) => {
+    const existTab = tabs.value.find(tab => tab.path === newPath)
+    if (!existTab) {
+      tabs.value.push({
         path: newPath,
-        name: route.name as string,
-        icon: route.meta.icon as Component
+        title: route.meta.title as string || '未命名',
+        icon: route.meta.icon
       })
     }
   },
   { immediate: true }
 )
-
-// 在 script setup 中导出 visitedTags
-defineExpose({
-  visitedTags
-})
 </script>
 
 <style scoped>
 .tabs-view {
-  height: 40px;
+  height: 44px;
   background: var(--n-color);
-  border-top: 1px solid var(--n-border-color);
   border-bottom: 1px solid var(--n-border-color);
   display: flex;
   align-items: center;
   padding: 0 16px;
   position: relative;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.tabs-scrollbar {
-  flex: 1;
-  height: 100%;
+  transition: all var(--transition-duration) var(--transition-timing);
 }
 
 .tabs-wrapper {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-item {
+  height: 36px;
+  padding: 0 12px;
   margin-right: 6px;
+  border-radius: 8px;
+  background: var(--n-color);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: var(--n-text-color-2);
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 6px 10px;
-  transition: all 0.3s;
-  border-radius: 4px;
-  background: transparent;
-  border: 1px solid var(--n-border-color);
-  color: var(--n-text-color);
+  transition: all var(--transition-duration) var(--transition-timing);
+  position: relative;
 }
 
 .tab-item:hover {
-  background-color: var(--n-hover-color);
+  color: var(--n-primary-color);
+  border-color: var(--n-primary-color);
+  background: var(--n-color);
   transform: translateY(-1px);
 }
 
 .tab-item-active {
-  background-color: var(--n-primary-color-hover) !important;
-  border-color: var(--n-primary-color);
   color: var(--n-primary-color);
+  background: var(--n-color);
+  border-color: var(--n-primary-color);
+  font-weight: 500;
 }
 
-.tab-item-active:hover {
-  background-color: var(--n-primary-color-suppl) !important;
-}
-
-.tabs-action {
+.tab-item-active::after {
+  content: '';
   position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--n-primary-color);
 }
 
-.action-button {
-  transition: all 0.3s;
+.tab-text {
+  margin: 0 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  color: inherit;
 }
 
-.action-button:hover {
-  background-color: #f3f4f6;
-  transform: rotate(30deg);
-}
-
-:deep(.n-tag) {
-  border-radius: 4px;
-  height: 28px;
-  background-color: var(--n-color);
-  border-color: var(--n-border-color);
-}
-
-:deep(.n-tag.n-tag--primary) {
-  background-color: var(--n-primary-color-hover);
-  border-color: var(--n-primary-color);
+.tab-item-active .tab-text {
+  opacity: 1;
   color: var(--n-primary-color);
 }
 
-:deep(.n-tag__close) {
+.close-button {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
-  margin-left: 6px;
-  transition: all 0.3s;
-  color: var(--n-text-color);
+  margin-left: 4px;
+  color: var(--n-text-color-2);
+  opacity: 0.8;
+  transition: all var(--transition-duration) var(--transition-timing);
+  cursor: pointer;
 }
 
-:deep(.n-tag__close:hover) {
-  background-color: var(--n-primary-color-hover);
+.close-button:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+  transform: rotate(90deg);
+}
+
+.tab-item-active .close-button {
   color: var(--n-primary-color);
 }
 
-:deep(.n-scrollbar-rail.n-scrollbar-rail--horizontal) {
-  height: 4px;
-  border-radius: 2px;
+/* 深色主题适配 */
+:deep(.dark) .tab-item {
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-:deep(.n-scrollbar-rail) {
-  background-color: transparent;
+:deep(.dark) .close-button:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-:deep(.n-scrollbar-rail:hover) {
-  background-color: rgba(0, 0, 0, 0.05);
+/* 添加滚动阴影 */
+.tabs-wrapper::before,
+.tabs-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 30px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-:deep(.n-scrollbar-content) {
-  padding: 6px 0;
+.tabs-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, var(--n-color), transparent);
 }
 
-/* 添加标签切换动画 */
-.tab-item {
-  animation: tab-in 0.3s ease-out;
+.tabs-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, var(--n-color), transparent);
 }
 
-@keyframes tab-in {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.tabs-wrapper:hover::before,
+.tabs-wrapper:hover::after {
+  opacity: 1;
+}
+
+/* 添加动画效果 */
+.tab-enter-active,
+.tab-leave-active {
+  transition: all 0.3s ease;
+}
+
+.tab-enter-from,
+.tab-leave-to {
+  opacity: 0;
+  transform: translateX(10px);
 }
 </style> 

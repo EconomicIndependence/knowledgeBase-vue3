@@ -1,83 +1,92 @@
 <template>
   <div class="login-container">
-    <div class="login-background"></div>
-    <div class="login-content">
+    <div class="cyberpunk-background">
+      <div class="bg-gradient"></div>
+      <div class="cyber-grid"></div>
+      <div class="pulse-overlay"></div>
+      <div class="scan-line"></div>
+    </div>
+    <div class="login-content" data-aos="fade-up" data-aos-duration="800">
       <n-card class="login-card">
         <div class="login-header">
-          <n-icon size="48" color="#18a058">
-            <cloud-outline />
-          </n-icon>
-          <h1>文件管理系统</h1>
-          <p class="subtitle">安全存储，便捷管理</p>
+          <div class="cyber-avatar-wrapper">
+            <n-icon size="48" color="#00BCD4" class="cyber-avatar">
+              <cloud-outline />
+            </n-icon>
+            <div class="cyber-ring"></div>
+            <div class="cyber-glitch"></div>
+          </div>
+          <h1 class="cyber-title">知识库管理系统</h1>
+          <p class="cyber-subtitle">KNOWLEDGE BASE MANAGEMENT</p>
         </div>
         <n-form
           ref="formRef"
           :model="formValue"
           :rules="rules"
           size="large"
+          class="login-form"
         >
-          <n-form-item path="username">
-            <n-input
-              v-model:value="formValue.username"
-              placeholder="请输入用户名"
-              clearable
-            >
-              <template #prefix>
-                <n-icon><person-outline /></n-icon>
-              </template>
-            </n-input>
-          </n-form-item>
-          <n-form-item path="password">
-            <n-input
-              v-model:value="formValue.password"
-              type="password"
-              show-password-on="click"
-              placeholder="请输入密码"
-              :maxlength="20"
-            >
-              <template #prefix>
-                <n-icon><lock-closed-outline /></n-icon>
-              </template>
-            </n-input>
-          </n-form-item>
+          <div class="cyber-input-wrapper">
+            <n-form-item path="username">
+              <n-input
+                v-model:value="formValue.username"
+                placeholder="输入用户名"
+                :input-props="{ autocomplete: 'off' }"
+              >
+                <template #prefix>
+                  <n-icon><person-outline /></n-icon>
+                </template>
+              </n-input>
+            </n-form-item>
+          </div>
+          <div class="cyber-input-wrapper">
+            <n-form-item path="password">
+              <n-input
+                v-model:value="formValue.password"
+                type="password"
+                show-password-on="click"
+                placeholder="输入密码"
+                :input-props="{ autocomplete: 'off' }"
+              >
+                <template #prefix>
+                  <n-icon><lock-closed-outline /></n-icon>
+                </template>
+              </n-input>
+            </n-form-item>
+          </div>
           <div class="login-options">
             <n-checkbox v-model:checked="rememberMe">
-              <span class="remember-text">记住我</span>
+              <span class="cyber-text">记住我</span>
             </n-checkbox>
-            <n-button text type="primary" class="forget-btn">忘记密码？</n-button>
+            <n-button text type="primary" class="cyber-link">忘记密码？</n-button>
           </div>
-          <n-button
-            type="primary"
-            block
-            size="large"
-            :loading="loading"
-            @click="handleLogin"
-          >
-            登录
-          </n-button>
+          <div class="cyber-button-container">
+            <n-button
+              type="primary"
+              block
+              size="large"
+              :loading="loading"
+              @click="handleLogin"
+              class="cyber-button"
+            >
+              <span class="button-glitch"></span>
+              <span class="button-text">{{ loading ? '正在验证...' : '登 录' }}</span>
+            </n-button>
+          </div>
         </n-form>
         <div class="login-footer">
-          <n-space justify="center" align="center">
-            <n-divider />
-            <span class="footer-text">其他登录方式</span>
-            <n-divider />
-          </n-space>
+          <div class="cyber-divider">
+            <span class="cyber-text">其他登录方式</span>
+          </div>
           <n-space justify="center" class="social-login">
-            <n-button quaternary circle>
-              <template #icon>
-                <n-icon><logo-github /></n-icon>
-              </template>
-            </n-button>
-            <n-button quaternary circle>
-              <template #icon>
-                <n-icon><logo-google /></n-icon>
-              </template>
-            </n-button>
-            <n-button quaternary circle>
-              <template #icon>
-                <n-icon><logo-wechat /></n-icon>
-              </template>
-            </n-button>
+            <div v-for="item in socialIcons" :key="item.icon.name" class="cyber-social-button">
+              <n-button quaternary circle>
+                <template #icon>
+                  <n-icon :component="item.icon" />
+                </template>
+              </n-button>
+              <div class="button-glow"></div>
+            </div>
           </n-space>
         </div>
       </n-card>
@@ -86,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import type { FormInst } from 'naive-ui'
@@ -98,6 +107,9 @@ import {
   PersonOutline, LockClosedOutline, CloudOutline,
   LogoGithub, LogoGoogle, LogoWechat
 } from '@vicons/ionicons5'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import VanillaTilt from 'vanilla-tilt'
 
 const router = useRouter()
 const message = useMessage()
@@ -129,12 +141,9 @@ const handleLogin = (e: MouseEvent) => {
     if (!errors) {
       loading.value = true
       try {
-        // 模拟登录延迟
         await new Promise(resolve => setTimeout(resolve, 1000))
-        // 设置登录状态
         localStorage.setItem('isLoggedIn', 'true')
         message.success('登录成功')
-        // 跳转到首页
         router.push('/dashboard')
       } finally {
         loading.value = false
@@ -142,43 +151,119 @@ const handleLogin = (e: MouseEvent) => {
     }
   })
 }
+
+onMounted(() => {
+  AOS.init()
+
+  const tiltElements = Array.from(document.querySelectorAll("[data-tilt]")) as HTMLElement[]
+  VanillaTilt.init(tiltElements, {
+    max: 15,
+    speed: 400,
+    glare: true,
+    "max-glare": 0.2
+  })
+})
+
+const socialIcons = [
+  { icon: LogoGithub, color: '#333' },
+  { icon: LogoGoogle, color: '#DB4437' },
+  { icon: LogoWechat, color: '#07C160' }
+]
+
+const generateRandomBinary = () => {
+  return Array.from({ length: 20 }, () => Math.round(Math.random())).join('')
+}
 </script>
 
 <style scoped>
 .login-container {
   height: 100vh;
   width: 100vw;
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #0A192F;
+  position: relative;
   overflow: hidden;
 }
 
-.login-background {
-  position: absolute;
+.cyberpunk-background {
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  z-index: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.bg-gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    #1a1a2e 0%,
+    #16213e 50%,
+    #0f3460 100%
+  );
+}
+
+.cyber-grid {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(16, 42, 66, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 42, 66, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(1000px) rotateX(60deg) translateY(-100px) scale(2.5);
+  opacity: 0.2;
+  animation: gridMove 20s linear infinite;
+}
+
+.pulse-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(0, 188, 212, 0.1) 0%,
+    transparent 50%
+  );
+  animation: pulse 4s ease-in-out infinite;
+  opacity: 0.5;
+}
+
+.scan-line {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 188, 212, 0.2) 50%,
+    transparent 100%
+  );
+  animation: scanMove 3s linear infinite;
+  opacity: 0.5;
 }
 
 .login-content {
   position: relative;
-  z-index: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   padding: 0 20px;
+  z-index: 1;
 }
 
 .login-card {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  padding: 24px;
+  background: rgba(16, 32, 56, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 188, 212, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 188, 212, 0.1);
+  border-radius: 12px;
 }
 
 .login-header {
@@ -186,16 +271,29 @@ const handleLogin = (e: MouseEvent) => {
   margin-bottom: 32px;
 }
 
-.login-header h1 {
+.logo-container {
+  margin-bottom: 16px;
+}
+
+.title {
   margin: 16px 0 8px;
   font-size: 24px;
-  color: #333;
+  font-weight: 600;
+  background: linear-gradient(45deg, #00BCD4, #3F51B5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .subtitle {
   margin: 0;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
+  letter-spacing: 4px;
+}
+
+.login-form {
+  margin-bottom: 24px;
 }
 
 .login-options {
@@ -206,11 +304,22 @@ const handleLogin = (e: MouseEvent) => {
 }
 
 .remember-text {
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.forget-btn {
-  font-size: 14px;
+.login-button {
+  height: 44px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  background: linear-gradient(45deg, #00BCD4, #3F51B5);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
 }
 
 .login-footer {
@@ -218,28 +327,166 @@ const handleLogin = (e: MouseEvent) => {
 }
 
 .footer-text {
-  color: #999;
-  font-size: 14px;
-  padding: 0 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  letter-spacing: 1px;
 }
 
 .social-login {
   margin-top: 16px;
 }
 
-/* 添加动画效果 */
-.login-card {
-  animation: slide-up 0.4s ease-out;
-}
-
-@keyframes slide-up {
+@keyframes gridMove {
   from {
-    opacity: 0;
-    transform: translateY(20px);
+    transform: perspective(1000px) rotateX(60deg) translateY(-100px) scale(2.5);
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
+    transform: perspective(1000px) rotateX(60deg) translateY(-50px) scale(2.5);
   }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes scanMove {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@media (max-width: 768px) {
+  .login-content {
+    padding: 0 16px;
+  }
+}
+
+.cyber-avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.cyber-avatar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 188, 212, 0.1);
+  box-shadow: 
+    0 0 20px rgba(0, 188, 212, 0.3),
+    0 0 60px rgba(0, 188, 212, 0.1);
+  animation: avatar-pulse 4s ease-in-out infinite;
+}
+
+.cyber-ring {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px solid rgba(0, 188, 212, 0.5);
+  border-radius: 12px;
+  animation: ring-rotate 10s linear infinite;
+}
+
+.cyber-ring::before,
+.cyber-ring::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+}
+
+.cyber-ring::before {
+  border-top: 2px solid rgba(0, 188, 212, 0.7);
+  border-right: 2px solid rgba(0, 188, 212, 0.7);
+  animation: ring-rotate 6s linear infinite;
+}
+
+.cyber-ring::after {
+  border-bottom: 2px solid rgba(0, 188, 212, 0.7);
+  border-left: 2px solid rgba(0, 188, 212, 0.7);
+  animation: ring-rotate 4s linear infinite reverse;
+}
+
+.cyber-glitch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, 
+    transparent 0%, 
+    rgba(0, 188, 212, 0.2) 50%, 
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: glitch-animation 3s ease-in-out infinite;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 12px;
+  mix-blend-mode: overlay;
+}
+
+@keyframes avatar-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glitch-animation {
+  0% {
+    background-position: -100% -100%;
+    opacity: 0;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 1;
+  }
+  100% {
+    background-position: -100% -100%;
+    opacity: 0;
+  }
+}
+
+@keyframes neonPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes glitchMove {
+  0% { background-position: -100% -100%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: -100% -100%; }
 }
 </style> 

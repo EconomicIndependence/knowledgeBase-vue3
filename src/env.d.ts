@@ -52,7 +52,9 @@ declare module 'naive-ui' {
     required?: boolean
     message?: string
     trigger?: string | string[]
-    validator?: (rule: any, value: any) => boolean | Promise<boolean>
+    validator?: (rule: FormItemRule, value: any) => boolean | Error | Promise<void>
+    type?: string
+    pattern?: RegExp
   }
 
   export interface DataTableColumns {
@@ -67,6 +69,18 @@ declare module 'naive-ui' {
     icon?: Component
     children?: DropdownOption[]
     type?: 'divider'
+  }
+
+  export interface UploadFileInfo {
+    id: string
+    name: string
+    status: 'pending' | 'uploading' | 'finished' | 'error'
+    percentage?: number
+    file?: File
+    url?: string
+    thumbnailUrl?: string
+    type?: string
+    size?: number
   }
 }
 
@@ -99,6 +113,8 @@ declare module '@vicons/ionicons5' {
   export const PhonePortraitOutline: Component
   export const FolderOutline: Component
   export const TrashOutline: Component
+  export const CloseOutline: Component
+  export const MenuOutline: Component
 }
 
 // 添加全局组件类型声明

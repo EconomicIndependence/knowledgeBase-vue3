@@ -13,8 +13,8 @@
       @expand="collapsed = false"
     >
       <div class="logo" @click="router.push('/')">
-        <n-icon size="32" :depth="inverted ? 2 : 3">
-          <cloud-outline />
+        <n-icon size="24" :depth="inverted ? 2 : 3" class="logo-icon">
+          <menu-outline />
         </n-icon>
         <h1 v-if="!collapsed" class="logo-text">文件管理系统</h1>
       </div>
@@ -53,25 +53,25 @@
             </n-breadcrumb>
           </div>
           <div class="header-right">
-            <n-space :size="16">
+            <n-space :size="16" align="center">
               <notification-popover />
               <n-dropdown 
                 :options="userOptions" 
                 @select="handleUserSelect" 
                 trigger="click"
-                :show-arrow="true"
+                placement="bottom-end"
               >
-                <n-button quaternary style="padding: 8px">
-                  <n-space align="center">
-                    <n-avatar 
-                      round 
-                      size="small" 
-                      src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-                    />
-                    <span>Admin</span>
-                    <n-icon><chevron-down /></n-icon>
-                  </n-space>
-                </n-button>
+                <n-space align="center" style="cursor: pointer">
+                  <n-avatar 
+                    round 
+                    size="small" 
+                    :src="userAvatar"
+                  />
+                  <span>Admin</span>
+                  <n-icon size="tiny">
+                    <chevron-down />
+                  </n-icon>
+                </n-space>
               </n-dropdown>
             </n-space>
           </div>
@@ -109,7 +109,8 @@ import {
   SearchOutline, StarOutline, ImageOutline,
   DocumentTextOutline, DownloadOutline, TimeOutline,
   CloudOutline, NotificationsOutline, ChevronDown,
-  SunnyOutline, MoonOutline, PersonOutline, LogOutOutline
+  SunnyOutline, MoonOutline, PersonOutline, LogOutOutline,
+  MenuOutline
 } from '@vicons/ionicons5'
 import TabsView from '../components/TabsView.vue'
 import NotificationPopover from '../components/NotificationPopover.vue'
@@ -122,6 +123,8 @@ const inverted = ref(false)
 const dialog = useDialog()
 const message = useMessage()
 const themeStore = useThemeStore()
+const showUserDropdown = ref(false)
+const userAvatar = 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
 
 // 面包屑导航
 const breadcrumbs = computed(() => {
@@ -283,23 +286,107 @@ const toggleTheme = () => {
 </script>
 
 <style scoped>
+/* 统一过渡变量 */
+:root {
+  --menu-transition-duration: 300ms;
+  --menu-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  --menu-transition: var(--menu-transition-duration) var(--menu-transition-timing);
+}
+
+/* 基础布局过渡 */
 .layout-container {
   height: 100vh;
   background-color: var(--n-color);
-  transition: all var(--transition-duration) var(--transition-timing) !important;
+  transition: all var(--menu-transition);
+  display: flex;
+  overflow: hidden;
 }
 
-.layout-sider {
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
-  position: relative;
+/* 统一所有组件的过渡效果 */
+.layout-sider,
+.layout-header,
+.layout-content,
+.content-container,
+.logo,
+.logo-text,
+:deep(.n-menu),
+:deep(.n-menu-item),
+:deep(.n-menu-item-content),
+:deep(.n-icon),
+:deep(.n-button),
+:deep(.n-divider),
+:deep([class*='n-border']),
+:deep([class*='n-box-shadow']) {
+  transition: 
+    color var(--menu-transition),
+    background-color var(--menu-transition),
+    border-color var(--menu-transition),
+    fill var(--menu-transition),
+    box-shadow var(--menu-transition),
+    opacity var(--menu-transition) !important;
+}
+
+/* 其他样式保持不变... */
+
+/* 优化边框过渡 */
+:deep(*) {
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+  transition-duration: var(--menu-transition-duration);
+  transition-timing-function: var(--menu-transition-timing);
+}
+
+/* 确保滚动条也有过渡效果 */
+:deep(.n-scrollbar-rail) {
+  transition: background-color var(--menu-transition) !important;
+}
+
+/* 优化阴影过渡 */
+:deep([class*='shadow']) {
+  transition: box-shadow var(--menu-transition) !important;
+}
+
+.header-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.layout-header {
+  height: 64px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.layout-content {
+  padding: 0 16px 16px;
+  background-color: var(--n-color-modal);
+  height: calc(100vh - 64px - 44px);
+  overflow: auto;
+  transition: background-color var(--transition) !important;
+}
+
+.content-container {
+  min-height: 100%;
+  padding: 16px;
   background-color: var(--n-color);
-  border-right: 1px solid var(--n-border-color);
-  transition: all var(--transition-duration) var(--transition-timing) !important;
+  position: relative;
+  transition: background-color var(--transition) !important;
 }
 
 .logo {
   height: 64px;
-  padding: 16px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -311,63 +398,28 @@ const toggleTheme = () => {
   background: rgba(0, 0, 0, 0.06);
 }
 
+.logo-icon {
+  opacity: 0.8;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-icon {
+  transform: scale(1.1);
+}
+
 .logo-text {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-color);
 }
 
-.layout-header {
-  height: 64px;
-  padding: 0 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.header-content {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.layout-content {
-  padding: 0 16px 16px;
-  background-color: var(--n-color-modal);
-  transition: all var(--transition-duration) var(--transition-timing) !important;
-}
-
-.content-container {
-  min-height: calc(100vh - 96px);
-  padding: 16px;
-  background-color: var(--n-color);
-  transition: all var(--transition-duration) var(--transition-timing) !important;
-}
-
-.sider-footer {
-  position: absolute;
-  bottom: 16px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-}
-
-/* 添加过渡动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.n-dropdown-option {
-  padding: 8px 16px !important;
-}
-
-.n-button:hover {
-  background-color: rgba(0, 0, 0, 0.06);
+/* 确保所有背景过渡同步 */
+:deep(.n-layout),
+:deep(.n-layout-sider),
+:deep(.n-layout-header),
+:deep(.n-layout-content) {
+  transition: background-color var(--transition) !important;
 }
 </style> 

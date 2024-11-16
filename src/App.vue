@@ -57,96 +57,65 @@ html, body {
   opacity: 0;
 }
 
-/* 统一过渡时间和缓动函数 */
+/* 统一过渡变量 */
 :root {
-  --transition-duration: 0.3s;
+  --transition-duration: 300ms;
   --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: var(--transition-duration) var(--transition-timing);
 }
 
-/* 优化全局主题切换过渡 */
-* {
+/* 主题过渡类 */
+.theme-transitioning,
+.theme-transitioning * {
   transition: 
     color var(--transition-duration) var(--transition-timing),
     background-color var(--transition-duration) var(--transition-timing),
     border-color var(--transition-duration) var(--transition-timing),
-    box-shadow var(--transition-duration) var(--transition-timing);
-}
-
-/* 优化布局相关元素的过渡 */
-.n-layout,
-.n-layout-sider,
-.n-layout-content,
-.n-card,
-.tabs-view {
-  transition: 
-    all var(--transition-duration) var(--transition-timing) !important;
+    box-shadow var(--transition-duration) var(--transition-timing),
+    fill var(--transition-duration) var(--transition-timing) !important;
 }
 
 /* 确保背景色过渡优先级 */
-body,
-.layout-container,
-.layout-content,
-.content-container {
-  transition: 
-    background-color var(--transition-duration) var(--transition-timing) !important;
+.theme-transitioning .n-config-provider,
+.theme-transitioning .n-layout,
+.theme-transitioning .n-layout-sider,
+.theme-transitioning .n-layout-header,
+.theme-transitioning .n-layout-content,
+.theme-transitioning .n-card,
+.theme-transitioning .content-container {
+  transition: background-color var(--transition-duration) var(--transition-timing) !important;
 }
 
-/* 优化深色主题样式和过渡 */
-:root {
-  --background-color: #ffffff;
-  --text-color: #333333;
-  --border-color: #eee;
-  --hover-color: #f5f5f5;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  transition: all var(--transition-duration) var(--transition-timing);
+/* 移除不需要过渡的元素 */
+.theme-transitioning .n-base-select-menu,
+.theme-transitioning .n-dropdown-menu,
+.theme-transitioning .n-popover,
+.theme-transitioning .n-menu-item-content-header,
+.theme-transitioning [class*='__transition'],
+.theme-transitioning [class*='n-base-wave'] {
+  transition: none !important;
 }
 
-:root.dark {
-  --background-color: #18181c;
-  --text-color: #ffffff;
-  --border-color: #333;
-  --hover-color: #242424;
-  --shadow-color: rgba(0, 0, 0, 0.2);
-  --selection-background: #3366ff40;
-  --selection-text: #ffffff;
+/* 路由过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--transition-duration) var(--transition-timing);
 }
 
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-}
-
-/* 添加内容过渡动画 */
-.content-fade-enter-active,
-.content-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.content-fade-enter-from,
-.content-fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 
-/* 添加全局选中样式 */
-::selection {
-  background-color: var(--selection-background, #2080f040);
-  color: var(--selection-text, #000000);
+/* 深色主题变量 */
+:root.dark {
+  color-scheme: dark;
 }
 
-::-moz-selection {
-  background-color: var(--selection-background, #2080f040);
-  color: var(--selection-text, #000000);
-}
-
-/* 优化深色主题下的文本可读性 */
-:root.dark * {
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-/* 优化深色主题下的交互反馈 */
-:root.dark .n-button:not(.n-button--disabled):active,
-:root.dark .n-tag:not(.n-tag--disabled):active,
-:root.dark .tab-item:active {
-  transform: scale(0.98);
+/* 优化滚动条过渡 */
+::-webkit-scrollbar,
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-thumb {
+  transition: all var(--transition-duration) var(--transition-timing);
 }
 </style> 

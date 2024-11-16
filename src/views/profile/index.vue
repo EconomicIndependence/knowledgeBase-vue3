@@ -6,7 +6,7 @@
           <n-form
             ref="formRef"
             :model="formValue"
-            :rules="rules"
+            :rules="formRules"
             label-placement="left"
             label-width="100"
           >
@@ -109,7 +109,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useMessage } from 'naive-ui'
-import type { FormInst, FormRules } from 'naive-ui'
+import type { FormInst, UploadFileInfo } from 'naive-ui'
 import { 
   NCard, 
   NTabs, 
@@ -147,7 +147,7 @@ const fileList = ref<UploadFileInfo[]>([])
 
 const loginDevices = ref([
   { 
-    id: 1, 
+    id: 1,
     name: 'Windows 10 - Chrome', 
     icon: DesktopOutline, 
     current: true 
@@ -160,28 +160,28 @@ const loginDevices = ref([
   }
 ])
 
-const rules: FormRules = {
-  username: {
+const formRules = {
+  username: [{
     required: true,
     message: '请输入用户名',
     trigger: 'blur'
-  },
-  email: {
+  }],
+  email: [{
     required: true,
     message: '请输入邮箱',
     trigger: 'blur',
     validator: (rule: any, value: string) => {
       return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)
     }
-  },
-  phone: {
+  }],
+  phone: [{
     required: true,
     message: '请输入手机号',
     trigger: 'blur',
     validator: (rule: any, value: string) => {
       return /^1[3-9]\d{9}$/.test(value)
     }
-  }
+  }]
 }
 
 const passwordRules = {
