@@ -54,13 +54,7 @@
           </div>
           <div class="header-right">
             <n-space :size="16">
-              <n-badge dot>
-                <n-button quaternary circle>
-                  <template #icon>
-                    <n-icon><notifications-outline /></n-icon>
-                  </template>
-                </n-button>
-              </n-badge>
+              <notification-popover />
               <n-dropdown 
                 :options="userOptions" 
                 @select="handleUserSelect" 
@@ -118,6 +112,8 @@ import {
   SunnyOutline, MoonOutline, PersonOutline, LogOutOutline
 } from '@vicons/ionicons5'
 import TabsView from '../components/TabsView.vue'
+import NotificationPopover from '../components/NotificationPopover.vue'
+import { useThemeStore } from '../stores/theme'
 
 const router = useRouter()
 const route = useRoute()
@@ -125,6 +121,7 @@ const collapsed = ref(false)
 const inverted = ref(false)
 const dialog = useDialog()
 const message = useMessage()
+const themeStore = useThemeStore()
 
 // 面包屑导航
 const breadcrumbs = computed(() => {
@@ -281,18 +278,23 @@ const handleUserSelect = (key: string) => {
 }
 
 const toggleTheme = () => {
-  inverted.value = !inverted.value
+  themeStore.toggleTheme()
 }
 </script>
 
 <style scoped>
 .layout-container {
   height: 100vh;
+  background-color: var(--n-color);
+  transition: all var(--transition-duration) var(--transition-timing) !important;
 }
 
 .layout-sider {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
   position: relative;
+  background-color: var(--n-color);
+  border-right: 1px solid var(--n-border-color);
+  transition: all var(--transition-duration) var(--transition-timing) !important;
 }
 
 .logo {
@@ -330,12 +332,15 @@ const toggleTheme = () => {
 
 .layout-content {
   padding: 0 16px 16px;
-  background: #f5f7f9;
+  background-color: var(--n-color-modal);
+  transition: all var(--transition-duration) var(--transition-timing) !important;
 }
 
 .content-container {
   min-height: calc(100vh - 96px);
   padding: 16px;
+  background-color: var(--n-color);
+  transition: all var(--transition-duration) var(--transition-timing) !important;
 }
 
 .sider-footer {

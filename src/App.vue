@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider>
+  <n-config-provider :theme="themeStore.theme" :theme-overrides="themeStore.themeOverrides">
     <n-loading-bar-provider>
       <n-dialog-provider>
         <n-notification-provider>
@@ -24,6 +24,14 @@ import {
   NNotificationProvider,
   NMessageProvider
 } from 'naive-ui'
+import { useThemeStore } from '@/stores/theme'
+import { onMounted } from 'vue'
+
+const themeStore = useThemeStore()
+
+onMounted(() => {
+  themeStore.initTheme()
+})
 </script>
 
 <style>
@@ -46,6 +54,74 @@ html, body {
 
 .fade-enter-from,
 .fade-leave-to {
+  opacity: 0;
+}
+
+/* 统一过渡时间和缓动函数 */
+:root {
+  --transition-duration: 0.3s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 优化全局主题切换过渡 */
+* {
+  transition: 
+    color var(--transition-duration) var(--transition-timing),
+    background-color var(--transition-duration) var(--transition-timing),
+    border-color var(--transition-duration) var(--transition-timing),
+    box-shadow var(--transition-duration) var(--transition-timing);
+}
+
+/* 优化布局相关元素的过渡 */
+.n-layout,
+.n-layout-sider,
+.n-layout-content,
+.n-card,
+.tabs-view {
+  transition: 
+    all var(--transition-duration) var(--transition-timing) !important;
+}
+
+/* 确保背景色过渡优先级 */
+body,
+.layout-container,
+.layout-content,
+.content-container {
+  transition: 
+    background-color var(--transition-duration) var(--transition-timing) !important;
+}
+
+/* 优化深色主题样式和过渡 */
+:root {
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #eee;
+  --hover-color: #f5f5f5;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+:root.dark {
+  --background-color: #18181c;
+  --text-color: #ffffff;
+  --border-color: #333;
+  --hover-color: #242424;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* 添加内容过渡动画 */
+.content-fade-enter-active,
+.content-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.content-fade-enter-from,
+.content-fade-leave-to {
   opacity: 0;
 }
 </style> 

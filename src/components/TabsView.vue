@@ -41,6 +41,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Component } from 'vue'
 import { NTag, NScrollbar, NButton, NDropdown, NIcon, type DropdownOption } from 'naive-ui'
 import { HomeOutline, SettingsOutline } from '@vicons/ionicons5'
+import { useThemeStore } from '@/stores/theme'
 
 interface TagView {
   title: string
@@ -55,6 +56,7 @@ interface TagView {
 
 const router = useRouter()
 const route = useRoute()
+const themeStore = useThemeStore()
 
 const visitedTags = ref<TagView[]>([
   {
@@ -144,9 +146,9 @@ defineExpose({
 <style scoped>
 .tabs-view {
   height: 40px;
-  background: #fff;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--n-color);
+  border-top: 1px solid var(--n-border-color);
+  border-bottom: 1px solid var(--n-border-color);
   display: flex;
   align-items: center;
   padding: 0 16px;
@@ -175,22 +177,23 @@ defineExpose({
   transition: all 0.3s;
   border-radius: 4px;
   background: transparent;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--n-border-color);
+  color: var(--n-text-color);
 }
 
 .tab-item:hover {
-  background-color: #f3f4f6;
+  background-color: var(--n-hover-color);
   transform: translateY(-1px);
 }
 
 .tab-item-active {
-  background-color: #ecf5ff !important;
-  border-color: #409eff;
-  color: #409eff;
+  background-color: var(--n-primary-color-hover) !important;
+  border-color: var(--n-primary-color);
+  color: var(--n-primary-color);
 }
 
 .tab-item-active:hover {
-  background-color: #e5f1ff !important;
+  background-color: var(--n-primary-color-suppl) !important;
 }
 
 .tabs-action {
@@ -212,22 +215,26 @@ defineExpose({
 :deep(.n-tag) {
   border-radius: 4px;
   height: 28px;
+  background-color: var(--n-color);
+  border-color: var(--n-border-color);
 }
 
 :deep(.n-tag.n-tag--primary) {
-  background-color: #ecf5ff;
-  border-color: #409eff;
+  background-color: var(--n-primary-color-hover);
+  border-color: var(--n-primary-color);
+  color: var(--n-primary-color);
 }
 
 :deep(.n-tag__close) {
   border-radius: 50%;
   margin-left: 6px;
   transition: all 0.3s;
+  color: var(--n-text-color);
 }
 
 :deep(.n-tag__close:hover) {
-  background-color: rgba(64, 158, 255, 0.1);
-  color: #409eff;
+  background-color: var(--n-primary-color-hover);
+  color: var(--n-primary-color);
 }
 
 :deep(.n-scrollbar-rail.n-scrollbar-rail--horizontal) {

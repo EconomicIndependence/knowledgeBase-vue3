@@ -25,6 +25,19 @@
             <n-form-item label="开启通知">
               <n-switch v-model:value="formValue.enableNotification" />
             </n-form-item>
+            <n-form-item label="主题颜色">
+              <n-color-picker
+                v-model:value="formValue.primaryColor"
+                :swatches="[
+                  '#18a058',
+                  '#2080f0',
+                  '#f0a020',
+                  '#d03050',
+                  '#8a2be2'
+                ]"
+                @update:value="handleColorChange"
+              />
+            </n-form-item>
           </n-form>
         </n-tab-pane>
         <n-tab-pane name="storage" tab="存储设置">
@@ -142,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h } from 'vue'
+import { ref, h, watch } from 'vue'
 import { useMessage } from 'naive-ui'
 import type { FormInst, DataTableColumns } from 'naive-ui'
 import {
@@ -162,11 +175,14 @@ import {
   NStatistic,
   NCheckboxGroup,
   NCheckbox,
-  NDataTable
+  NDataTable,
+  NColorPicker
 } from 'naive-ui'
+import { useThemeStore } from '@/stores/theme'
 
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
+const themeStore = useThemeStore()
 
 // 存储相关数据
 const totalStorage = 1000
@@ -175,7 +191,7 @@ const storageUsage = Math.round((usedStorage / totalStorage) * 100)
 
 const formValue = ref({
   systemName: '文件管理系统',
-  theme: 'light',
+  theme: themeStore.isDark ? 'dark' : 'light',
   language: 'zh-CN',
   pageSize: 20,
   enableNotification: true,
@@ -186,7 +202,20 @@ const formValue = ref({
   maxFileSize: 100,
   enableAutoBackup: true,
   backupInterval: 'daily',
-  backupRetention: '30days'
+  backupRetention: '30days',
+  primaryColor: localStorage.getItem('primaryColor') || '#18a058'
+})
+
+watch(() => formValue.value.theme, (newTheme) => {
+  if (newTheme === 'dark' && !themeStore.isDark) {
+    themeStore.toggleTheme()
+  } else if (newTheme === 'light' && themeStore.isDark) {
+    themeStore.toggleTheme()
+  }
+})
+
+watch(() => themeStore.isDark, (isDark) => {
+  formValue.value.theme = isDark ? 'dark' : 'light'
 })
 
 const themeOptions = [
@@ -282,7 +311,8 @@ const handleReset = () => {
     maxFileSize: 100,
     enableAutoBackup: true,
     backupInterval: 'daily',
-    backupRetention: '30days'
+    backupRetention: '30days',
+    primaryColor: localStorage.getItem('primaryColor') || '#18a058'
   }
   message.success('设置已重置')
 }
@@ -297,6 +327,18 @@ const handleRestore = (row: any) => {
 
 const handleDeleteBackup = (row: any) => {
   message.success('备份已删除')
+}
+
+const handleColorChange = (color: string) => {
+  themeStore.updatePrimaryColor(color)
+}
+
+const handleThemeChange = (theme: string) => {
+  if (theme === 'dark') {
+    themeStore.isDark || themeStore.toggleTheme()
+  } else {
+    themeStore.isDark && themeStore.toggleTheme()
+  }
 }
 </script>
 
