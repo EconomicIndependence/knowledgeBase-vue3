@@ -107,6 +107,8 @@ body,
   --border-color: #333;
   --hover-color: #242424;
   --shadow-color: rgba(0, 0, 0, 0.2);
+  --selection-background: #3366ff40;
+  --selection-text: #ffffff;
 }
 
 body {
@@ -123,5 +125,28 @@ body {
 .content-fade-enter-from,
 .content-fade-leave-to {
   opacity: 0;
+}
+
+/* 添加全局选中样式 */
+::selection {
+  background-color: var(--selection-background, #2080f040);
+  color: var(--selection-text, #000000);
+}
+
+::-moz-selection {
+  background-color: var(--selection-background, #2080f040);
+  color: var(--selection-text, #000000);
+}
+
+/* 优化深色主题下的文本可读性 */
+:root.dark * {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* 优化深色主题下的交互反馈 */
+:root.dark .n-button:not(.n-button--disabled):active,
+:root.dark .n-tag:not(.n-tag--disabled):active,
+:root.dark .tab-item:active {
+  transform: scale(0.98);
 }
 </style> 

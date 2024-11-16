@@ -63,57 +63,218 @@ export const useThemeStore = defineStore('theme', () => {
     const modalColor = isDarkMode ? '#242429' : '#f5f7f9'
     const borderColor = isDarkMode ? '#333' : '#eee'
     
-    // 使用 requestAnimationFrame 确保样式更新在同一帧
-    requestAnimationFrame(() => {
-      themeOverrides.value = {
-        common: {
-          primaryColor: color,
-          primaryColorHover: hover,
-          primaryColorPressed: pressed,
-          primaryColorSuppl: hover,
-          // 主题相关颜色
-          bodyColor: backgroundColor,
-          cardColor: cardColor,
-          modalColor: modalColor,
-          borderColor: borderColor,
-          textColor1: isDarkMode ? '#ffffff' : '#333333',
-          textColor2: isDarkMode ? '#ccc' : '#666',
-          textColor3: isDarkMode ? '#999' : '#999',
-          // 背景色
-          baseColor: backgroundColor,
-          // 悬浮状态
-          hoverColor: isDarkMode ? '#242424' : '#f5f5f5'
-        },
-        Card: {
-          borderRadius: '8px',
-          color: cardColor,
-          colorModal: modalColor
-        },
-        Tag: {
-          borderRadius: '4px'
-        },
-        Button: {
-          colorPrimary: color,
-          colorHoverPrimary: hover,
-          colorPressedPrimary: pressed,
-          colorFocusPrimary: hover
-        },
-        Input: {
-          color: cardColor,
-          borderColor: borderColor,
-          colorFocus: color
-        },
-        Menu: {
-          borderColor: borderColor
+    themeOverrides.value = {
+      common: {
+        primaryColor: color,
+        primaryColorHover: hover,
+        primaryColorPressed: pressed,
+        primaryColorSuppl: hover,
+        // 主题相关颜色
+        bodyColor: backgroundColor,
+        cardColor: cardColor,
+        modalColor: modalColor,
+        borderColor: borderColor,
+        textColor1: isDarkMode ? '#ffffff' : '#333333',
+        textColor2: isDarkMode ? '#ccc' : '#666',
+        textColor3: isDarkMode ? '#999' : '#999',
+        // 背景色
+        baseColor: backgroundColor,
+        // 悬浮状态
+        hoverColor: isDarkMode ? '#242424' : '#f5f5f5'
+      },
+      Card: {
+        borderRadius: '8px',
+        color: isDarkMode ? '#242429' : '#ffffff',
+        colorModal: modalColor,
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        titleTextColor: isDarkMode ? '#ffffff' : '#333333',
+        closeIconColor: isDarkMode ? '#666' : '#999',
+        closeIconColorHover: isDarkMode ? '#fff' : '#333',
+        closeColorHover: isDarkMode ? '#333' : '#f5f5f5'
+      },
+      Tag: {
+        borderRadius: '4px',
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        color: isDarkMode ? '#242429' : '#ffffff',
+        border: isDarkMode ? '1px solid #333' : '1px solid #e0e0e0'
+      },
+      Button: {
+        colorPrimary: color,
+        colorHoverPrimary: hover,
+        colorPressedPrimary: pressed,
+        colorFocusPrimary: hover
+      },
+      Input: {
+        color: isDarkMode ? '#242429' : '#ffffff',
+        colorDisabled: isDarkMode ? '#242429' : '#ffffff',
+        colorFocus: isDarkMode ? '#242429' : '#ffffff',
+        colorHover: isDarkMode ? '#242429' : '#ffffff',
+        borderColor: isDarkMode ? '#444' : '#d9d9d9',
+        borderColorHover: color,
+        borderColorFocus: color,
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        placeholderColor: isDarkMode ? '#666' : '#999',
+        boxShadowFocus: `0 0 0 2px ${adjustColor(color, -40)}40`,
+        caretColor: color,
+        peers: {
+          Suffix: {
+            textColor: isDarkMode ? '#666' : '#999'
+          },
+          Prefix: {
+            textColor: isDarkMode ? '#666' : '#999'
+          }
         }
+      },
+      Menu: {
+        borderColor: borderColor
+      },
+      Checkbox: {
+        colorChecked: color,
+        colorTableHeaderChecked: color,
+        colorHoverChecked: hover,
+        colorPressedChecked: pressed,
+        // 深色主题下的复选框样式
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        color: isDarkMode ? '#242429' : '#ffffff',
+        colorDisabled: isDarkMode ? '#333' : '#f5f5f5',
+        colorCheckedDisabled: isDarkMode ? '#444' : '#d9d9d9',
+        borderColor: isDarkMode ? '#444' : '#d9d9d9',
+        borderColorDisabled: isDarkMode ? '#333' : '#d9d9d9',
+        borderColorChecked: color,
+        checkMarkColor: isDarkMode ? '#ffffff' : '#ffffff',
+        checkboxColor: 'transparent',
+        checkboxColorChecked: 'transparent',
+        checkboxColorDisabled: 'transparent',
+        checkboxColorFocus: 'transparent',
+        checkboxColorHover: 'transparent'
+      },
+      Select: {
+        peers: {
+          InternalSelection: {
+            textColor: isDarkMode ? '#ffffff' : '#333333',
+            color: isDarkMode ? '#242429' : '#ffffff',
+            colorActive: isDarkMode ? '#1a1a1f' : '#f5f5f5',
+            placeholderColor: isDarkMode ? '#666' : '#999',
+            border: isDarkMode ? '1px solid #444' : '1px solid #d9d9d9',
+            borderHover: `1px solid ${color}`,
+            borderActive: `1px solid ${color}`
+          },
+          InternalSelectMenu: {
+            color: isDarkMode ? '#242429' : '#ffffff',
+            optionTextColor: isDarkMode ? '#ffffff' : '#333333',
+            optionTextColorActive: isDarkMode ? '#ffffff' : '#333333',
+            optionColorPending: isDarkMode ? '#1a1a1f' : '#f5f5f5',
+            optionColorActive: 'transparent'
+          }
+        }
+      },
+      DatePicker: {
+        itemTextColor: isDarkMode ? '#ffffff' : '#333333',
+        panelColor: isDarkMode ? '#242429' : '#ffffff',
+        peers: {
+          TimePicker: {
+            itemTextColor: isDarkMode ? '#ffffff' : '#333333',
+            panelColor: isDarkMode ? '#242429' : '#ffffff',
+            peers: {
+              Scrollbar: {
+                railColor: isDarkMode ? '#333' : '#f5f5f5'
+              }
+            }
+          }
+        }
+      },
+      Dropdown: {
+        color: isDarkMode ? '#242429' : '#ffffff',
+        optionTextColor: isDarkMode ? '#ffffff' : '#333333',
+        optionColorHover: isDarkMode ? '#1a1a1f' : '#f5f5f5'
+      },
+      Radio: {
+        buttonTextColor: isDarkMode ? '#ffffff' : '#333333',
+        buttonColor: isDarkMode ? '#242429' : '#ffffff',
+        buttonBorderColor: isDarkMode ? '#444' : '#d9d9d9',
+        buttonBorderColorActive: color,
+        buttonBoxShadowFocus: `0 0 0 2px ${adjustColor(color, -40)}40`
+      },
+      Switch: {
+        railColor: isDarkMode ? '#333' : '#d9d9d9',
+        railColorActive: color,
+        buttonColor: isDarkMode ? '#ffffff' : '#ffffff',
+        boxShadowFocus: `0 0 0 2px ${adjustColor(color, -40)}40`
+      },
+      Slider: {
+        railColor: isDarkMode ? '#333' : '#d9d9d9',
+        railColorHover: isDarkMode ? '#444' : '#bfbfbf',
+        fillColor: color,
+        fillColorHover: hover,
+        handleColor: isDarkMode ? '#ffffff' : '#ffffff',
+        dotColor: isDarkMode ? '#333' : '#d9d9d9',
+        dotColorActive: color
+      },
+      Tabs: {
+        tabTextColorActive: color,
+        tabTextColor: isDarkMode ? '#999' : '#666',
+        barColor: color,
+        tabColorHover: isDarkMode ? '#1a1a1f' : '#f5f5f5'
+      },
+      Tree: {
+        nodeTextColor: isDarkMode ? '#ffffff' : '#333333',
+        nodeColorHover: isDarkMode ? '#1a1a1f' : '#f5f5f5',
+        nodeColorPressed: isDarkMode ? '#242429' : '#e6e6e6',
+        arrowColor: isDarkMode ? '#666' : '#999'
+      },
+      List: {
+        color: 'transparent',
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        colorHover: isDarkMode ? '#1a1a1f' : '#f5f5f5',
+        dividerColor: isDarkMode ? '#333' : '#f0f0f0'
+      },
+      Thing: {
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        titleTextColor: isDarkMode ? '#ffffff' : '#333333',
+        contentTextColor: isDarkMode ? '#999' : '#666',
+        descriptionTextColor: isDarkMode ? '#666' : '#999'
+      },
+      Dialog: {
+        color: isDarkMode ? '#242429' : '#ffffff',
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        titleTextColor: isDarkMode ? '#ffffff' : '#333333'
+      },
+      Popover: {
+        color: isDarkMode ? '#242429' : '#ffffff',
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        padding: '16px',
+        border: isDarkMode ? '1px solid #333' : '1px solid #eee',
+        peers: {
+          Scrollbar: {
+            railColor: isDarkMode ? '#333' : '#f5f5f5'
+          }
+        }
+      },
+      Empty: {
+        textColor: isDarkMode ? '#666' : '#999',
+        iconColor: isDarkMode ? '#333' : '#e0e0e0'
+      },
+      Scrollbar: {
+        color: isDarkMode ? '#333' : '#e0e0e0',
+        colorHover: isDarkMode ? '#444' : '#bfbfbf'
+      },
+      Notification: {
+        color: isDarkMode ? '#242429' : '#ffffff',
+        textColor: isDarkMode ? '#ffffff' : '#333333',
+        titleTextColor: isDarkMode ? '#ffffff' : '#333333',
+        boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.12)',
+        headerBorderBottom: isDarkMode ? '1px solid #333' : '1px solid #eee',
+        closeIconColor: isDarkMode ? '#666' : '#999',
+        closeIconColorHover: isDarkMode ? '#fff' : '#333',
+        closeColorHover: isDarkMode ? '#333' : '#f5f5f5'
       }
-      
-      // 应用 CSS 变量
-      const root = document.documentElement
-      root.style.setProperty('--background-color', backgroundColor)
-      root.style.setProperty('--text-color', isDarkMode ? '#ffffff' : '#333333')
-      root.style.setProperty('--border-color', borderColor)
-    })
+    }
+    
+    // 应用 CSS 变量
+    const root = document.documentElement
+    root.style.setProperty('--background-color', backgroundColor)
+    root.style.setProperty('--text-color', isDarkMode ? '#ffffff' : '#333333')
+    root.style.setProperty('--border-color', borderColor)
   }
 
   // 辅助函数：调整颜色亮度

@@ -77,8 +77,10 @@ const handleClearAll = () => {
   notificationStore.clearAll()
 }
 
-const getTagType = (type: string) => {
-  const typeMap: Record<string, string> = {
+type TagType = 'default' | 'error' | 'success' | 'info' | 'warning' | 'primary'
+
+const getTagType = (type: string): TagType => {
+  const typeMap: Record<string, TagType> = {
     info: 'info',
     success: 'success',
     warning: 'warning',
@@ -101,11 +103,13 @@ const getTypeText = (type: string) => {
 <style scoped>
 .notification-popover {
   padding: 12px 0;
+  transition: all var(--transition-duration) var(--transition-timing);
 }
 
 .notification-header {
   padding: 0 16px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
+  transition: border-color var(--transition-duration) var(--transition-timing);
 }
 
 .notification-list {
@@ -115,19 +119,19 @@ const getTypeText = (type: string) => {
 .notification-item {
   padding: 12px 16px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all var(--transition-duration) var(--transition-timing);
 }
 
 .notification-item:hover {
-  background-color: #f5f5f5;
+  background-color: var(--hover-color);
 }
 
 .notification-item-unread {
-  background-color: #f0f7ff;
+  background-color: var(--n-color-hover);
 }
 
 .notification-item-unread:hover {
-  background-color: #e6f4ff;
+  background-color: var(--n-color-active);
 }
 
 .notification-content {
@@ -137,16 +141,28 @@ const getTypeText = (type: string) => {
 .notification-title {
   font-weight: 500;
   margin-bottom: 4px;
+  color: var(--text-color);
+  transition: color var(--transition-duration) var(--transition-timing);
 }
 
 .notification-text {
-  color: #666;
+  color: var(--text-color-2);
   font-size: 13px;
   margin-bottom: 4px;
+  transition: color var(--transition-duration) var(--transition-timing);
 }
 
 .notification-time {
-  color: #999;
+  color: var(--text-color-3);
   font-size: 12px;
+  transition: color var(--transition-duration) var(--transition-timing);
+}
+
+:deep(.n-popover) {
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+:deep(.n-tag) {
+  transition: all var(--transition-duration) var(--transition-timing);
 }
 </style> 
